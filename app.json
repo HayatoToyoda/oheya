@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "HelloWorld",
-    "slug": "expo-template-default",
+    "slug": "oheya",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -31,6 +31,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "0c4ecec6-fdd9-430e-9ff4-eb95df6328f8"
+      }
+    },
+    "owner": "toyodaappdev"
   }
 }
