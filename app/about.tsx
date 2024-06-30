@@ -10,12 +10,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Link href="/about" asChild>
-      <Pressable>
-        <Text>Hello World!!</Text>
-      </Pressable>
-      </Link>
+      <Text>Hello World!!</Text>
     </View>
   );
-
 }
