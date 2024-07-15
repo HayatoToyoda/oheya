@@ -10,12 +10,21 @@ export default function Index() {
         alignItems: "center",
       }}
     >
+      <Link href="/home" asChild>
+        <Pressable>
+          <Text>Go to Home Screen</Text>
+        </Pressable>
+      </Link>
       <Link href="/about" asChild>
-      <Pressable>
-        <Text>Hello World!!</Text>
-      </Pressable>
+        <Pressable>
+          <Text>Go to About Page</Text>
+        </Pressable>
+      </Link>
+      <Link href="/itemsForALine" asChild>
+        <Pressable>
+          <Text>Go to Items For A Line</Text>
+        </Pressable>
       </Link>
     </View>
   );
-
 }
