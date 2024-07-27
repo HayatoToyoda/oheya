@@ -6,7 +6,7 @@ const ItemsForALine = () => {
     <View style={styles.itemsForALine}>
       <View style={[styles.rectangleParent, styles.rectangleLayout]}>
         <View style={styles.frameChild} />
-        <Image style={styles.frameItem} resizeMode="cover" source={require('../assets/Ellipse 1.png')} />
+        <Image style={styles.frameItem} resizeMode="cover" />
         <View style={styles.rectangleGroup}>
           <View style={[styles.groupChild, styles.groupLayout]} />
           <View style={[styles.groupItem, styles.groupLayout]} />
@@ -17,7 +17,7 @@ const ItemsForALine = () => {
       </View>
       <View style={[styles.rectangleContainer, styles.rectangleLayout]}>
         <View style={styles.frameChild} />
-        <Image style={styles.frameItem} resizeMode="cover" source={require('../assets/Ellipse 1.png')} />
+        <Image style={styles.frameItem} resizeMode="cover" />
         <View style={styles.rectangleGroup}>
           <View style={[styles.groupChild, styles.groupLayout]} />
           <View style={[styles.groupItem, styles.groupLayout]} />
