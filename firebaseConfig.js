@@ -22,8 +22,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication and get a reference to the service
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-export { auth, provider};
+// Export the authentication service for use in your app
+export { auth,};
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
 
