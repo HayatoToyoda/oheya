@@ -10,10 +10,10 @@ export const getUserProfile = (userId: string, callback: (data: User | null) => 
     const data = snapshot.val();
     if (data) {
       const userProfile = { uid: userId, ...data };
-      console.log('utils/firebase/userService.tx - User profile retrieved successfully:', userProfile); // Log successful message
+      console.log('utils/firebase/userService.ts - User profile retrieved successfully:', userProfile); // Log successful message
       callback(userProfile);
     } else {
-      console.log('utils/firebase/userService.tx - User profile not found for userId:', userId); // Log error message
+      console.log('utils/firebase/userService.ts - User profile not found for userId:', userId); // Log error message
       callback(null);
     }
   }, {
