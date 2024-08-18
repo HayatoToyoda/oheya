@@ -4,7 +4,7 @@ import { Image, StyleSheet, View } from "react-native";
 const Home = () => {
   return (
     <View style={styles.home}>
-      <Image style={styles.homeChild} resizeMode="cover" source={require('../assets/images/user.png')} />
+      <Image style={styles.homeChild} resizeMode="cover" source={require('../../assets/images/user.png')} />
       <View style={[styles.rectangleParent, styles.rectangleLayout]}>
         <View style={styles.groupChild} />
         <View style={[styles.groupItem, styles.groupLayout]} />

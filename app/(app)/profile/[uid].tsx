@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams, useGlobalSearchParams } from 'expo-router';
-import { getUserProfile } from '../../utils/firebase/userService';
-import { User } from '../../types/user'; // Adjust the import path as necessary
+import { getUserProfile } from '@/utils/firebase/userService';
+import { User } from '@/types/user'; // Adjust the import path as necessary
 
 const UserProfile = () => {
   const { uid } = useLocalSearchParams<{ uid: string }>();
