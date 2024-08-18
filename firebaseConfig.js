@@ -1,6 +1,5 @@
-// @ts-ignore
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { initializeApp } from "firebase/app";
+import { initializeAuth, getReactNativePersistence } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -26,6 +25,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and get a reference to the service
+// Add ReactNativeAsyncStorage to persist login state beteen sessions
 const auth = initializeAuth(app, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
