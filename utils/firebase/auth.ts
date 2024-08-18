@@ -1,9 +1,10 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref, set } from 'firebase/database';
-import { auth, database } from '../../firebaseConfig';
-import { User } from '../../types/user';
-import { EmailInUseError, WeakPasswordError } from '../../types/errors/auth';
-import { DatabaseError } from '../../types/errors/database';
+import { auth, database } from '@/firebaseConfig';
+import { User } from '@/types/user';
+import { EmailInUseError, WeakPasswordError } from '@/types/errors/auth';
+import { DatabaseError } from '@/types/errors/database';
+import { router } from 'expo-router';
 
 export const createUser = async (email: string, password: string) => {
   try {
@@ -13,7 +14,6 @@ export const createUser = async (email: string, password: string) => {
     // Define the user object with initial values
     const user: User = {
       uid: userCredential.user.uid,
-      email: email,
       followerCount: 0,
       followingCount: 0,
       postCount: 0
@@ -47,5 +47,22 @@ export const createUser = async (email: string, password: string) => {
       console.log(error);
       throw error;
     }
+  }
+};
+
+export const handleSignIn = async (email: string, password: string) => {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    router.replace('/');
+  } catch (error) {
+    console.error('Sign in error:', error);
+  }
+};
+
+export const handleSignOut = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error('Sign out error:', error);
   }
 };
