@@ -25,6 +25,11 @@ export default function Index() {
           <Text>Go to Items For A Line</Text>
         </Pressable>
       </Link>
+      <Link href="/profile" asChild>
+        <Pressable>
+          <Text>Go to User Profiles</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
