@@ -12,7 +12,7 @@ export default function SignIn() {
       await handleSignIn(email, password);
       router.replace('/');
     } catch (error) {
-      console.error('Sign in error:', error);
+      console.log('app/sign-in.tsx/SignIn() - Sign in error:', error);
       // You might want to show an error message to the user here
     }
   };

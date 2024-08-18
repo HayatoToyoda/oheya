@@ -10,10 +10,10 @@ export const getUserProfile = (userId: string, callback: (data: User | null) => 
     const data = snapshot.val();
     if (data) {
       const userProfile = { uid: userId, ...data };
-      console.log('utils/firebase/userService.ts - User profile retrieved successfully:', userProfile); // Log successful message
+      console.log('utils/firebase/userService.ts/getUserProfile() - User profile retrieved successfully:', userProfile); // Log successful message
       callback(userProfile);
     } else {
-      console.log('utils/firebase/userService.ts - User profile not found for userId:', userId); // Log error message
+      console.log('utils/firebase/userService.ts/getUserProfile() - User profile not found for userId:', userId); // Log error message
       callback(null);
     }
   }, {
@@ -23,6 +23,6 @@ export const getUserProfile = (userId: string, callback: (data: User | null) => 
   // Return a function to unsubscribe from the listener
   return () => {
     off(userRef, 'value', listener);
-    console.log('utils/firebase/userService.tx - Listener unsubscribed for userId:', userId); // Log message when unsubscribing
+    console.log('utils/firebase/userService.ts/getUserProfile() - Listener unsubscribed for userId:', userId); // Log message when unsubscribing
   };
 };

@@ -10,7 +10,7 @@ export default function Index() {
     try {
       await handleSignOut();
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('app/(app)/index.tsx/Index() - Sign out error:', error);
     }
   }
 
