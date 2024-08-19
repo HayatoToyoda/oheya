@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-navigation/native": "^6.0.2",
     "expo": "~51.0.20",
     "expo-constants": "~16.0.1",
@@ -25,6 +26,7 @@
     "expo-splash-screen": "~0.27.5",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
+    "expo-template-default": "file:",
     "expo-web-browser": "~13.0.3",
     "firebase": "^10.12.2",
     "react": "18.2.0",
