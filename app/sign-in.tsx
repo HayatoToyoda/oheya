@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 import { handleSignIn } from '@/utils/firebase/auth';
 
 export default function SignIn() {

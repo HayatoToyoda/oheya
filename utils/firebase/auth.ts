@@ -13,6 +13,8 @@ export const createUser = async (email: string, password: string) => {
     // Define the user object with initial values
     const user: User = {
       uid: userCredential.user.uid,
+      profilePicture: "",
+      bio: "",
       followerCount: 0,
       followingCount: 0,
       postCount: 0
