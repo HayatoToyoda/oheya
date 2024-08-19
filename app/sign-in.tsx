@@ -13,7 +13,6 @@ export default function SignIn() {
       router.replace('/');
     } catch (error) {
       console.log('app/sign-in.tsx/SignIn() - Sign in error:', error);
-      // You might want to show an error message to the user here
     }
   };
 
@@ -38,6 +37,11 @@ export default function SignIn() {
       <TouchableOpacity style={styles.button} onPress={onSignIn}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
+      <Text style={styles.signupText}>Not registered?
+        <Link href="/sign-up" asChild>
+          <Text style={styles.signupLink}> Sign up now!</Text>
+        </Link> 
+      </Text>
     </View>
   );
 }
@@ -77,6 +81,14 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
+    fontWeight: 'bold',
+  },
+  signupText: {
+    marginTop: 20, // Add spacing between the Sign In button and the signup text
+    color: '#333',
+  },
+  signupLink: {
+    color: '#007AFF',
     fontWeight: 'bold',
   },
 });
