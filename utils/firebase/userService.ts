@@ -1,7 +1,7 @@
 // userService.ts
 import { ref, onValue, off, } from 'firebase/database'; // Import getDatabase, Database, and DataSnapshot
-import { database } from '../../firebaseConfig';
-import { User } from '../../types/user'; // Adjust the import path as necessary
+import { database } from '@/firebaseConfig';
+import { User } from '@/types/user'; // Adjust the import path as necessary
 
 export const getUserProfile = (userId: string, callback: (data: User | null) => void) => {
   const userRef = ref(database, `users/${userId}`);
