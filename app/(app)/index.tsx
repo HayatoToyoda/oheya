@@ -39,6 +39,16 @@ export default function Index() {
           <Text>Go to Items For A Line</Text>
         </Pressable>
       </Link>
+      <Link href="/media-storage" asChild>
+        <Pressable>
+          <Text>Go to media storage</Text>
+        </Pressable>
+      </Link>
+      <Link href="/test" asChild>
+        <Pressable>
+          <Text>Go to test</Text>
+        </Pressable>
+      </Link>
       <Link href="/profile" asChild>
         <Pressable>
           <Text>Go to User Profiles</Text>
