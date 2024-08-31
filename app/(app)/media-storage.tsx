@@ -3,7 +3,7 @@ import { Button, Image, View, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function ImagePickerExample() {
-  const [image, setImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library
@@ -17,14 +17,17 @@ export default function ImagePickerExample() {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert('You did not select any image.');
     }
   };
+
 
   return (
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {selectedImage && <Image source={{ uri: selectedImage }} style={styles.image} />}
     </View>
   );
 }
