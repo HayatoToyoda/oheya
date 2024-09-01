@@ -5,7 +5,11 @@ import { createUser, handleSignIn } from '@/utils/firebase/auth';
 import { EmailInUseError, WeakPasswordError } from '@/types/errors/auth';
 import { DatabaseError } from '@/types/errors/database';
 
+const fileName = 'app/sign-up.tsx';
+
 const SignUpForm = () => {
+  const componentName = 'SignUpForm()';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<null | string>(null);
@@ -16,7 +20,7 @@ const SignUpForm = () => {
       setError(null); // Clear any previous errors
       router.replace('/')
     } catch (error) {
-      console.log('app/sign-up.tsx/SignUpForm() - Sign up error:', error);
+      console.log(`${fileName}/${componentName} - Sign up error:`, error);
       if (error instanceof EmailInUseError) {
         setError('The email address is already in use.');
       } else if (error instanceof WeakPasswordError) {
