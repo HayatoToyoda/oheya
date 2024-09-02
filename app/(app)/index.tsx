@@ -22,7 +22,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Welcome, {user?.email}</Text>
+      <Text testID="user-email-text">Welcome, {user?.email}</Text>
       <Button title="Sign Out" onPress={onSignOut} />
       <Link href="/home" asChild>
         <Pressable>
