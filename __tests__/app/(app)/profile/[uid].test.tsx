@@ -1,5 +1,3 @@
-// [uid].test.tsx
-
 import React from 'react';
 import { render, waitFor, act } from '@testing-library/react-native';
 import UserProfile from '@/app/(app)/profile/[uid]'; // Adjust the import path as necessary

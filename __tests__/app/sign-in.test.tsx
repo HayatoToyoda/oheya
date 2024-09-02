@@ -1,5 +1,3 @@
-// __tests__/SignIn.test.tsx
-
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import SignIn from '@/app/sign-in';

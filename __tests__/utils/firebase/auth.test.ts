@@ -1,5 +1,3 @@
-// __tests__/utils/firebase/auth.test.ts
-
 import { createUser, handleSignIn, handleSignOut } from '@/utils/firebase/auth';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { ref, set } from 'firebase/database';

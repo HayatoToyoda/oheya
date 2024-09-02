@@ -1,5 +1,3 @@
-// __tests__/Index.test.tsx
-
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import Index from '@/app/(app)/index'; // Adjust the import path as necessary

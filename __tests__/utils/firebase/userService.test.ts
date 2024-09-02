@@ -1,5 +1,3 @@
-// __tests__/utils/firebase/userService.test.ts
-
 import { getUserProfile } from '@/utils/firebase/userService';
 import { database } from '@/firebaseConfig';
 import { ref, onValue, off, DatabaseReference, DataSnapshot } from 'firebase/database';

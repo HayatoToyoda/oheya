@@ -1,5 +1,3 @@
-// __tests__/SignUpForm.test.tsx
-
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import SignUpForm from '@/app/sign-up'; // Adjust the import path as necessary

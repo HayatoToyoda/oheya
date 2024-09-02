@@ -1,4 +1,3 @@
-// [uid].tsx
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';

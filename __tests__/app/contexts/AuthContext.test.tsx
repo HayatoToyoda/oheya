@@ -1,5 +1,3 @@
-// __tests__/AuthProvider.test.tsx
-
 import React from 'react';
 import { View, Text } from 'react-native';
 import { render, waitFor } from '@testing-library/react-native';
