@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { router, Link } from 'expo-router';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native';
-import { createUser, handleSignIn } from '@/utils/firebase/auth'; 
+import { createUser } from '@/utils/firebase/auth'; 
 import { EmailInUseError, WeakPasswordError } from '@/types/errors/auth';
 import { DatabaseError } from '@/types/errors/database';
 
