@@ -35,7 +35,7 @@ const SignUpForm = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text testID="page-title" style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -52,7 +52,7 @@ const SignUpForm = () => {
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={onSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text testID="sign-up-button" style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <Text style={styles.signinText}>Already registered?
         <Link href="/sign-in" asChild>

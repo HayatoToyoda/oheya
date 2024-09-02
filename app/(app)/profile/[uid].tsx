@@ -29,7 +29,7 @@ const UserProfile = () => {
 
   if (loading) {
     console.log(`${fileName}/${componentName} - Status: Loading user data...`); // Log status: Loading user data
-    return <ActivityIndicator style={styles.loader} size="large" color="#0000ff" />;
+    return <ActivityIndicator testID="loading-indicator" style={styles.loader} size="large" color="#0000ff" />;
   }
 
   if (!userData) {

@@ -24,7 +24,7 @@ export default function SignIn() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+      <Text testID="page-title" style={styles.title}>Sign In</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -41,7 +41,7 @@ export default function SignIn() {
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={onSignIn}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text testID="sign-in-button" style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
       <Text style={styles.signupText}>Not registered?
         <Link href="/sign-up" asChild>
