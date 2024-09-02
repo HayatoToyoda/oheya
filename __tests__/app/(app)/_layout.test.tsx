@@ -1,5 +1,3 @@
-// __tests__/AppLayout.test.tsx
-
 import React from 'react';
 import { render } from '@testing-library/react-native';
 import AppLayout from '@/app/(app)/_layout'; // Adjust the import path as necessary
