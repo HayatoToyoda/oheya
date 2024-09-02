@@ -69,6 +69,13 @@ describe('Auth Functions', () => {
       expect(mockConsoleLog).toHaveBeenCalledWith(expect.stringMatching(`${fileName}/${moduleName}.*([Pp]assword.*weak)|([Ww]eak.*password)`));
     });
 
+    it('should throw Error when unexpected firebase error is thrown', async () => {
+      (createUserWithEmailAndPassword as jest.Mock).mockRejectedValue({ code: 'auth/invalid-email' });
+
+      await expect(createUser('test@example.com', 'weak')).rejects.toEqual({ code: 'auth/invalid-email' });
+      expect(mockConsoleLog).toHaveBeenCalledWith(expect.stringMatching(`${fileName}/${moduleName}.*[Uu]nexpected.*error`));
+    })
+
     it('should handle database error and delete user', async () => {
       const mockDelete = jest.fn();
       const mockUserCredential = {
@@ -99,8 +106,7 @@ describe('Auth Functions', () => {
     it('should handle sign in error', async () => {
       (signInWithEmailAndPassword as jest.Mock).mockRejectedValue(new Error('Sign in failed'));
 
-      await handleSignIn('test@example.com', 'wrongpassword');
-
+      await expect(handleSignIn('test@example.com', 'wrongpassword')).rejects.toThrow(expect.any(Error));
       expect(mockConsoleLog).toHaveBeenCalledWith(expect.stringMatching(`^${fileName}/${moduleName}.*([Ss]ign in.*error)|([Ee]rror.*sign in)`), expect.any(Error));
     });
   });
@@ -120,8 +126,7 @@ describe('Auth Functions', () => {
     it('should handle sign out error', async () => {
       (signOut as jest.Mock).mockRejectedValue(new Error('Sign out failed'));
 
-      await handleSignOut();
-
+      await expect(handleSignOut()).rejects.toThrow(expect.any(Error));
       expect(mockConsoleLog).toHaveBeenCalledWith(expect.stringMatching(`^${fileName}/${moduleName}.*([Ss]ign out.*error)|([Ee]rror.*sign out)`), expect.any(Error));
     });
   });
