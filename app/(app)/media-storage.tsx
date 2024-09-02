@@ -4,13 +4,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { initializeApp } from 'firebase/app';
-import { firebaseConfig } from '../../firebaseConfig';
+import { database } from '../../firebaseConfig';
 
-// Firebaseを初期化
-const app = initializeApp(firebaseConfig);
-const storage = getStorage(app);
-const db = getFirestore(app);
 
 export default function ImagePickerExample() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
