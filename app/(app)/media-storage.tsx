@@ -3,13 +3,13 @@ import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { database } from '../../firebaseConfig';
+import { storage } from '../../firebaseConfig'; // storage を import
 
 
 export default function ImagePickerExample() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // アップロードされた画像のURLを保存する状態
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -62,16 +62,15 @@ export default function ImagePickerExample() {
       });
 
       const filename = manipResult.uri.substring(manipResult.uri.lastIndexOf('/') + 1);
-      const storageRef = ref(storage, filename);
-      await uploadBytes(storageRef, blob); // uploadBytesResumable を uploadBytes に戻す
+      const storageRef = ref(storage, 'images/' + filename); 
+      await uploadBytes(storageRef, blob).then((snapshot) => {
+        console.log(snapshot.metadata.name) // images
+        console.log(snapshot.metadata.fullPath) // images/filename
+        })
 
       // アップロードした画像のダウンロードURLを取得
       const downloadURL = await getDownloadURL(storageRef);
-
-      // Firestoreに画像のURLを保存
-      await addDoc(collection(db, 'images'), {
-        imageUrl: downloadURL,
-      });
+      setUploadedImageUrl(downloadURL); // URLを状態に保存
 
       Alert.alert('Success', 'Image uploaded successfully!');
     } catch (error) {
@@ -100,6 +99,9 @@ export default function ImagePickerExample() {
             onPress={compressAndUploadImage}
             disabled={isUploading}
           />
+          {uploadedImageUrl && (
+            <Text>Uploaded Image URL: {uploadedImageUrl}</Text> 
+          )}
         </>
       )}
     </View>

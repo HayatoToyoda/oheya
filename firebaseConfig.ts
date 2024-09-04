@@ -40,6 +40,10 @@ if (Platform.OS !== 'web') {
 // Initialize Firebase Realtime Database
 const database = getDatabase(app);
 
-export { firebaseConfig, auth, database };
+// Initialize Firebase Storage
+const storage = getStorage(app); 
+
+
+export { firebaseConfig, auth, database, storage };
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
