@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebaseConfig'; // storage を import
-
+import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../firebaseConfig'; 
+import ProgressBar from './ProgressBar'; 
 
 export default function ImagePickerExample() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // アップロードされた画像のURLを保存する状態
+  const [uploadProgress, setUploadProgress] = useState(0); 
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); 
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -39,14 +40,12 @@ export default function ImagePickerExample() {
     try {
       setIsUploading(true);
 
-      // 画像を圧縮
       const manipResult = await manipulateAsync(
         selectedImage,
         [{ resize: { width: 500 } }],
         { compress: 0.7, format: SaveFormat.JPEG }
       );
 
-      // 圧縮した画像をFirebase Storageにアップロード
       const blob = await new Promise<Blob>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
@@ -63,27 +62,39 @@ export default function ImagePickerExample() {
 
       const filename = manipResult.uri.substring(manipResult.uri.lastIndexOf('/') + 1);
       const storageRef = ref(storage, 'images/' + filename); 
-      await uploadBytes(storageRef, blob).then((snapshot) => {
-        console.log(snapshot.metadata.name) // images
-        console.log(snapshot.metadata.fullPath) // images/filename
-        })
 
-      // アップロードした画像のダウンロードURLを取得
-      const downloadURL = await getDownloadURL(storageRef);
-      setUploadedImageUrl(downloadURL); // URLを状態に保存
+      const uploadTask = uploadBytesResumable(storageRef, blob);
 
-      Alert.alert('Success', 'Image uploaded successfully!');
-    } catch (error) {
-      console.error('Error uploading image: ', error);
-      if (error instanceof TypeError) {
-        Alert.alert('Error', 'Network error occurred. Please check your internet connection.');
-      } else if (error instanceof Error && error.message.includes('storage/unauthorized')) {
-        Alert.alert('Error', 'You are not authorized to upload images. Please sign in.');
-      } else {
-        Alert.alert('Error', 'Failed to upload image. Please try again later.');
-      }
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(progress); 
+        }, 
+        (error) => {
+          console.error('Error uploading image: ', error);
+          switch (error.code) {
+            case 'storage/unauthorized':
+              Alert.alert('Error', 'You are not authorized to upload images. Please sign in.');
+              break;
+            case 'storage/canceled':
+              Alert.alert('Error', 'Upload canceled.');
+              break;
+            default:
+              Alert.alert('Error', 'Failed to upload image. Please try again later.');
+              break;
+          }
+        }, 
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            setUploadedImageUrl(downloadURL);
+            Alert.alert('Success', 'Image uploaded successfully!');
+          });
+        }
+      );
+
     } finally {
       setIsUploading(false);
+      setUploadProgress(0); 
     }
   };
 
@@ -99,6 +110,7 @@ export default function ImagePickerExample() {
             onPress={compressAndUploadImage}
             disabled={isUploading}
           />
+          {isUploading && <ProgressBar progress={uploadProgress / 100} />} 
           {uploadedImageUrl && (
             <Text>Uploaded Image URL: {uploadedImageUrl}</Text> 
           )}
