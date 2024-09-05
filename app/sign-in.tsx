@@ -3,22 +3,28 @@ import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-nativ
 import { router, Link } from 'expo-router';
 import { handleSignIn } from '@/utils/firebase/auth';
 
+const fileName = 'app/sign-in.tsx';
+
 export default function SignIn() {
+  const componentName = 'SignIn()';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<null | string>(null);
 
   const onSignIn = async () => {
     try {
       await handleSignIn(email, password);
       router.replace('/');
     } catch (error) {
-      console.log('app/sign-in.tsx/SignIn() - Sign in error:', error);
+      console.log(`${fileName}/${componentName} - Sign in error:`, error);
+      setError('Invalid credential.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign In</Text>
+      <Text testID="page-title" style={styles.title}>Sign In</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -35,13 +41,14 @@ export default function SignIn() {
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={onSignIn}>
-        <Text style={styles.buttonText}>Sign In</Text>
+        <Text testID="sign-in-button" style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
       <Text style={styles.signupText}>Not registered?
         <Link href="/sign-up" asChild>
           <Text style={styles.signupLink}> Sign up now!</Text>
         </Link> 
       </Text>
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
@@ -90,5 +97,10 @@ const styles = StyleSheet.create({
   signupLink: {
     color: '#007AFF',
     fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 10,
   },
 });
