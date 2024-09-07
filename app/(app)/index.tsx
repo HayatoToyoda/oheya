@@ -34,9 +34,9 @@ export default function Index() {
           <Text>Go to About Page</Text>
         </Pressable>
       </Link>
-      <Link href="/itemsForALine" asChild>
+      <Link href="/DisplayMedia" asChild>
         <Pressable>
-          <Text>Go to Items For A Line</Text>
+          <Text>Go to Display Media</Text>
         </Pressable>
       </Link>
       <Link href="/media-storage" asChild>
