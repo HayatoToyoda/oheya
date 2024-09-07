@@ -1,19 +1,22 @@
-// userService.ts
 import { ref, onValue, off, } from 'firebase/database'; // Import getDatabase, Database, and DataSnapshot
-import { database } from '../../firebaseConfig';
-import { User } from '../../types/user'; // Adjust the import path as necessary
+import { database } from '@/firebaseConfig';
+import { User } from '@/types/user'; // Adjust the import path as necessary
+
+const fileName = 'utils/firebase/userService.ts';
 
 export const getUserProfile = (userId: string, callback: (data: User | null) => void) => {
+  const moduleName = 'getUserProfile()';
+
   const userRef = ref(database, `users/${userId}`);
   
   const listener = onValue(userRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
       const userProfile = { uid: userId, ...data };
-      console.log('utils/firebase/userService.ts/getUserProfile() - User profile retrieved successfully:', userProfile); // Log successful message
+      console.log(`${fileName}/${moduleName} - User profile retrieved successfully:`, userProfile); // Log successful message
       callback(userProfile);
     } else {
-      console.log('utils/firebase/userService.ts/getUserProfile() - User profile not found for userId:', userId); // Log error message
+      console.log(`${fileName}/${moduleName} - User profile not found for userId:`, userId); // Log error message
       callback(null);
     }
   }, {
@@ -23,6 +26,6 @@ export const getUserProfile = (userId: string, callback: (data: User | null) => 
   // Return a function to unsubscribe from the listener
   return () => {
     off(userRef, 'value', listener);
-    console.log('utils/firebase/userService.ts/getUserProfile() - Listener unsubscribed for userId:', userId); // Log message when unsubscribing
+    console.log(`${fileName}/${moduleName} - Listener unsubscribed for userId:`, userId); // Log message when unsubscribing
   };
 };

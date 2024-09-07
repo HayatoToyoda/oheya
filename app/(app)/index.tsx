@@ -3,14 +3,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { handleSignOut } from "@/utils/firebase/auth";
 import { Link } from "expo-router";
 
+const fileName = 'app/(app)/index.tsx';
+
 export default function Index() {
+  const componentName = 'Index()';
+
   const { user } = useAuth();
 
   const onSignOut = async () => {
     try {
       await handleSignOut();
     } catch (error) {
-      console.error('app/(app)/index.tsx/Index() - Sign out error:', error);
+      console.log(`${fileName}/${componentName} - Sign out error:`, error);
     }
   }
 
@@ -22,7 +26,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Welcome, {user?.email}</Text>
+      <Text testID="user-email-text">Welcome, {user?.email}</Text>
       <Button title="Sign Out" onPress={onSignOut} />
       <Link href="/home" asChild>
         <Pressable>
