@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { router, Link } from 'expo-router';
 import { StyleSheet, View, TextInput, TouchableOpacity, Text } from 'react-native';
-import { createUser, handleSignIn } from '@/utils/firebase/auth'; 
+import { createUser } from '@/utils/firebase/auth'; 
 import { EmailInUseError, WeakPasswordError } from '@/types/errors/auth';
 import { DatabaseError } from '@/types/errors/database';
 
+const fileName = 'app/sign-up.tsx';
+
 const SignUpForm = () => {
+  const componentName = 'SignUpForm()';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<null | string>(null);
@@ -16,7 +20,7 @@ const SignUpForm = () => {
       setError(null); // Clear any previous errors
       router.replace('/')
     } catch (error) {
-      console.log('app/sign-up.tsx/SignUpForm() - Sign up error:', error);
+      console.log(`${fileName}/${componentName} - Sign up error:`, error);
       if (error instanceof EmailInUseError) {
         setError('The email address is already in use.');
       } else if (error instanceof WeakPasswordError) {
@@ -31,7 +35,7 @@ const SignUpForm = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
+      <Text testID="page-title" style={styles.title}>Sign Up</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -48,7 +52,7 @@ const SignUpForm = () => {
         secureTextEntry
       />
       <TouchableOpacity style={styles.button} onPress={onSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text testID="sign-up-button" style={styles.buttonText}>Sign Up</Text>
       </TouchableOpacity>
       <Text style={styles.signinText}>Already registered?
         <Link href="/sign-in" asChild>

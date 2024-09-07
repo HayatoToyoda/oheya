@@ -36,3 +36,6 @@ yarn-error.*
 
 expo-env.d.ts
 app-example
+
+# jest test coverage reports
+coverage/**/*

@@ -3,8 +3,6 @@ import { initializeAuth, getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
 import { Platform } from "react-native";
-
-
 // Conditional import for React Native persistence
 let reactNativePersistence;
 if (Platform.OS !== 'web') {
@@ -39,11 +37,10 @@ if (Platform.OS !== 'web') {
 
 // Initialize Firebase Realtime Database
 const database = getDatabase(app);
-
 // Initialize Firebase Storage
 const storage = getStorage(app); 
 
 
-export { firebaseConfig, auth, database, storage };
+export { auth, database, storage };
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase
