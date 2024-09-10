@@ -2,9 +2,68 @@ import { useState } from 'react';
 import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebaseConfig'; 
+import { storage, database, auth } from '../../firebaseConfig'; 
+import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { ref as databaseRef,push, update, onValue, serverTimestamp } from 'firebase/database';
+import { getAuth } from 'firebase/auth'; // Firebase Authentication をインポート
 import ProgressBar from './ProgressBar'; 
+
+const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string) => {
+  try {
+    const userId = auth.currentUser?.uid; // ユーザーIDを取得 (認証が実装されている場合)
+    if (!userId) {
+      console.error("User not authenticated.");
+      return;
+    }
+
+    const postId = push(databaseRef(database, 'posts')).key; // 新しいpostIdを生成
+    if (!postId) {
+      console.error("Failed to generate post ID.");
+      return;
+    }
+
+    const postData = {
+      postId: postId,
+      uid: userId,
+      imageURL: downloadURL,
+      caption: 'キャプション', // 必要に応じて変更
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    console.log("postData:", postData); // postDataの内容を出力
+    console.log("users/{userId}/posts に書き込み開始", userId, postId); 
+    console.log("posts コレクションに書き込み開始", postId); 
+    
+    // posts コレクションに投稿の詳細データを保存
+    await update(databaseRef(database, `posts/${postId}`), postData)
+      .then(() => {
+        console.log("posts コレクションに書き込み完了"); 
+      })
+      .catch((error) => {
+        console.error("posts コレクション書き込みエラー:", error); 
+      });
+      
+    // users/{userId}/posts に投稿IDをキーとしてtrueを値として保存
+    await update(databaseRef(database, `users/${userId}/posts`), { [postId]: true }) 
+      .then(() => {
+        console.log("users/{userId}/posts に書き込み完了");
+      })
+      .catch((error) => {
+        console.error("users/{userId}/posts 書き込みエラー:", error);
+      });
+    
+
+    
+    
+
+    console.log('メディアメタデータが保存されました');
+  } catch (error) {
+    console.error('メディアメタデータの保存に失敗しました:', error);
+    // エラー発生時の処理 (例: Alertを表示)
+    Alert.alert('Error', 'Failed to save media metadata.');
+  }
+};
 
 export default function ImagePickerExample() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -61,9 +120,12 @@ export default function ImagePickerExample() {
       });
 
       const filename = manipResult.uri.substring(manipResult.uri.lastIndexOf('/') + 1);
-      const storageRef = ref(storage, 'images/' + filename); 
+      const userId = auth.currentUser?.uid; // ユーザーIDを取得
+      const randomString = Math.random().toString(36).substring(2, 15); // ランダムな文字列を生成
+      const storagePath = `images/${userId}/${randomString}_${filename}`; // ファイルパスを生成
+      const imageRef = storageRef(storage, storagePath); // ストレージリファレンスを生成
 
-      const uploadTask = uploadBytesResumable(storageRef, blob);
+      const uploadTask = uploadBytesResumable(imageRef, blob);
 
       uploadTask.on('state_changed', 
         (snapshot) => {
@@ -88,6 +150,7 @@ export default function ImagePickerExample() {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setUploadedImageUrl(downloadURL);
             Alert.alert('Success', 'Image uploaded successfully!');
+            saveMediaMetadataToDatabase(filename, downloadURL); // メタデータ保存関数を呼び出し
           });
         }
       );
