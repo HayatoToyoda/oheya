@@ -4,13 +4,13 @@ import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { storage, database, auth } from '../../firebaseConfig'; 
 import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { ref as databaseRef,push, update, onValue, serverTimestamp } from 'firebase/database';
+import { ref as databaseRef,push, update, serverTimestamp, runTransaction } from 'firebase/database';
 import { getAuth } from 'firebase/auth'; // Firebase Authentication をインポート
 import ProgressBar from './ProgressBar'; 
 
 const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string) => {
   try {
-    const userId = auth.currentUser?.uid; // ユーザーIDを取得 (認証が実装されている場合)
+    const userId = auth.currentUser?.uid; // ユーザーIDを取得
     if (!userId) {
       console.error("User not authenticated.");
       return;
@@ -22,7 +22,7 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
       return;
     }
 
-    const postData = {
+    const postData = { //likes,comments,sharesなどは後ほど追加
       postId: postId,
       uid: userId,
       imageURL: downloadURL,
@@ -53,15 +53,19 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
         console.error("users/{userId}/posts 書き込みエラー:", error);
       });
     
-
-    
-    
-
     console.log('メディアメタデータが保存されました');
-  } catch (error) {
+  } catch (error: any) { // any 型にキャストしてエラーオブジェクトのプロパティにアクセス
     console.error('メディアメタデータの保存に失敗しました:', error);
-    // エラー発生時の処理 (例: Alertを表示)
-    Alert.alert('Error', 'Failed to save media metadata.');
+    // エラーコードに応じた処理
+    if (error.code === 'PERMISSION_DENIED') {
+      Alert.alert('Error', 'You do not have permission to save media metadata.');
+    } else if (error.code === 'DATABASE_ERROR') {
+      Alert.alert('Error', 'Failed to connect to the database.');
+      // データベース接続エラーの場合は再試行処理などを実装
+    } else {
+      Alert.alert('Error', 'Failed to save media metadata. Please try again later.');
+      // その他のエラーの場合は詳細なエラー情報 (error.message など) を表示
+    }
   }
 };
 
