@@ -10,61 +10,62 @@ import ProgressBar from './ProgressBar';
 
 const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string) => {
   try {
-    const userId = auth.currentUser?.uid; // ユーザーIDを取得
+    const userId = auth.currentUser?.uid;
     if (!userId) {
       console.error("User not authenticated.");
       return;
     }
 
-    const postId = push(databaseRef(database, 'posts')).key; // 新しいpostIdを生成
+    const postIdRef = push(databaseRef(database, 'posts')); // Get a reference to the new post ID
+    const postId = postIdRef.key;
+
     if (!postId) {
       console.error("Failed to generate post ID.");
       return;
     }
 
-    const postData = { //likes,comments,sharesなどは後ほど追加
-      postId: postId,
-      uid: userId,
-      imageURL: downloadURL,
-      caption: 'キャプション', // 必要に応じて変更
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
+    await runTransaction(databaseRef(database), async (currentData) => {
+      if (currentData === null) {
+        currentData = {};
+      }
 
-    console.log("postData:", postData); // postDataの内容を出力
-    console.log("users/{userId}/posts に書き込み開始", userId, postId); 
-    console.log("posts コレクションに書き込み開始", postId); 
-    
-    // posts コレクションに投稿の詳細データを保存
-    await update(databaseRef(database, `posts/${postId}`), postData)
-      .then(() => {
-        console.log("posts コレクションに書き込み完了"); 
-      })
-      .catch((error) => {
-        console.error("posts コレクション書き込みエラー:", error); 
-      });
+      const postData = {
+        postId: postId,
+        uid: userId,
+        imageURL: downloadURL,
+        caption: 'Caption', // Can be changed as needed
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      console.log("postData:", postData);
+
+      console.log("Writing to posts collection (within transaction)", postId)    
+      currentData[`posts/${postId}`] = postData;
+      console.log("After adding postData: currentData = ", currentData);
       
-    // users/{userId}/posts に投稿IDをキーとしてtrueを値として保存
-    await update(databaseRef(database, `users/${userId}/posts`), { [postId]: true }) 
-      .then(() => {
-        console.log("users/{userId}/posts に書き込み完了");
-      })
-      .catch((error) => {
-        console.error("users/{userId}/posts 書き込みエラー:", error);
-      });
-    
-    console.log('メディアメタデータが保存されました');
-  } catch (error: any) { // any 型にキャストしてエラーオブジェクトのプロパティにアクセス
-    console.error('メディアメタデータの保存に失敗しました:', error);
-    // エラーコードに応じた処理
+      console.log("Writing to users/{userId}/posts (within transaction)", userId, postId);
+      currentData[`users/${userId}/posts/${postId}`] = true;
+      console.log("After adding user-post link: currentData = ", currentData); 
+
+
+      return currentData;
+    });
+
+    console.log('Media metadata saved successfully (transaction completed)');
+  } catch (error: any) {
+    console.error('Failed to save media metadata:', error);
     if (error.code === 'PERMISSION_DENIED') {
       Alert.alert('Error', 'You do not have permission to save media metadata.');
     } else if (error.code === 'DATABASE_ERROR') {
       Alert.alert('Error', 'Failed to connect to the database.');
-      // データベース接続エラーの場合は再試行処理などを実装
+      // Implement retry mechanism in case of database connection error
+    } else if (error.code === 'ABORTED') {
+      Alert.alert('Error', 'Transaction aborted. Data might be modified by another user.');
+      // ABORTED error indicates that the transaction was interrupted due to a conflict
     } else {
-      Alert.alert('Error', 'Failed to save media metadata. Please try again later.');
-      // その他のエラーの場合は詳細なエラー情報 (error.message など) を表示
+      Alert.alert('Error', 'Failed to save media metadata. Please try again later. Error:', error.message);
+      // For other errors, display detailed error information (error.message, etc.)
     }
   }
 };
