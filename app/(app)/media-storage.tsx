@@ -5,18 +5,25 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { storage, database, auth } from '../../firebaseConfig'; 
 import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { ref as databaseRef,push, update, serverTimestamp, runTransaction } from 'firebase/database';
-import { getAuth } from 'firebase/auth'; // Firebase Authentication をインポート
+import { getAuth } from 'firebase/auth'; // Firebase Authentication 
 import ProgressBar from './ProgressBar'; 
 
+/**
+ * Saves media metadata to the Realtime Database using a transaction.
+ * @param filename - The name of the uploaded file.
+ * @param downloadURL - The download URL of the uploaded file.
+ */
 const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string) => {
   try {
+    // Get the authenticated user's ID.
     const userId = auth.currentUser?.uid;
     if (!userId) {
       console.error("User not authenticated.");
       return;
     }
 
-    const postIdRef = push(databaseRef(database, 'posts')); // Get a reference to the new post ID
+    // Generate a new post ID.
+    const postIdRef = push(databaseRef(database, 'posts')); 
     const postId = postIdRef.key;
 
     if (!postId) {
@@ -24,30 +31,33 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
       return;
     }
 
+    // Use a transaction to atomically update the database.
     await runTransaction(databaseRef(database), async (currentData) => {
       if (currentData === null) {
         currentData = {};
       }
 
+      // Create the post data object.
       const postData = {
         postId: postId,
         uid: userId,
         imageURL: downloadURL,
-        caption: 'Caption', // Can be changed as needed
+        caption: 'Caption', // Can be customized.
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
 
       console.log("postData:", postData);
 
+      // Add the post data to the 'posts' collection.
       console.log("Writing to posts collection (within transaction)", postId)    
       currentData[`posts/${postId}`] = postData;
       console.log("After adding postData: currentData = ", currentData);
       
+      // Add a reference to the post in the user's 'posts' node.
       console.log("Writing to users/{userId}/posts (within transaction)", userId, postId);
       currentData[`users/${userId}/posts/${postId}`] = true;
       console.log("After adding user-post link: currentData = ", currentData); 
-
 
       return currentData;
     });
@@ -55,27 +65,36 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
     console.log('Media metadata saved successfully (transaction completed)');
   } catch (error: any) {
     console.error('Failed to save media metadata:', error);
+    // Handle different error codes.
     if (error.code === 'PERMISSION_DENIED') {
       Alert.alert('Error', 'You do not have permission to save media metadata.');
     } else if (error.code === 'DATABASE_ERROR') {
       Alert.alert('Error', 'Failed to connect to the database.');
-      // Implement retry mechanism in case of database connection error
+      // Implement retry logic for database connection errors.
     } else if (error.code === 'ABORTED') {
       Alert.alert('Error', 'Transaction aborted. Data might be modified by another user.');
-      // ABORTED error indicates that the transaction was interrupted due to a conflict
+      // Handle transaction aborts due to conflicts.
     } else {
       Alert.alert('Error', 'Failed to save media metadata. Please try again later. Error:', error.message);
-      // For other errors, display detailed error information (error.message, etc.)
+      // Display detailed error information for other errors.
     }
   }
 };
 
+/**
+ * A component that allows the user to pick an image from their camera roll,
+ * compress it, upload it to Firebase Storage, and save its metadata to the Realtime Database.
+ */
 export default function ImagePickerExample() {
+  // State variables for managing the image selection and upload process.
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0); 
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); 
 
+  /**
+   * Allows the user to pick an image from their camera roll using Expo's ImagePicker.
+   */
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -85,6 +104,7 @@ export default function ImagePickerExample() {
     });
 
     if (!result.canceled) {
+      // Check if the file size exceeds the limit (5MB).
       if (result.assets[0].fileSize && result.assets[0].fileSize > 1024 * 1024 * 5) {
         Alert.alert('Error', 'File size exceeds the limit (5MB).');
         return;
@@ -95,6 +115,9 @@ export default function ImagePickerExample() {
     }
   };
 
+  /**
+   * Compresses the selected image and uploads it to Firebase Storage.
+   */
   const compressAndUploadImage = async () => {
     if (!selectedImage) {
       alert('Please select an image first.');
@@ -104,12 +127,14 @@ export default function ImagePickerExample() {
     try {
       setIsUploading(true);
 
+      // Compress the image using Expo's ImageManipulator.
       const manipResult = await manipulateAsync(
         selectedImage,
         [{ resize: { width: 500 } }],
         { compress: 0.7, format: SaveFormat.JPEG }
       );
 
+      // Convert the compressed image to a Blob.
       const blob = await new Promise<Blob>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.onload = function () {
@@ -124,20 +149,24 @@ export default function ImagePickerExample() {
         xhr.send(null);
       });
 
+      // Generate a unique filename for the image.
       const filename = manipResult.uri.substring(manipResult.uri.lastIndexOf('/') + 1);
-      const userId = auth.currentUser?.uid; // ユーザーIDを取得
-      const randomString = Math.random().toString(36).substring(2, 15); // ランダムな文字列を生成
-      const storagePath = `images/${userId}/${randomString}_${filename}`; // ファイルパスを生成
-      const imageRef = storageRef(storage, storagePath); // ストレージリファレンスを生成
+      const userId = auth.currentUser?.uid; 
+      const randomString = Math.random().toString(36).substring(2, 15); 
+      const storagePath = `images/${userId}/${randomString}_${filename}`; 
+      const imageRef = storageRef(storage, storagePath); 
 
+      // Upload the image to Firebase Storage.
       const uploadTask = uploadBytesResumable(imageRef, blob);
 
       uploadTask.on('state_changed', 
         (snapshot) => {
+          // Track upload progress.
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           setUploadProgress(progress); 
         }, 
         (error) => {
+          // Handle upload errors.
           console.error('Error uploading image: ', error);
           switch (error.code) {
             case 'storage/unauthorized':
@@ -152,10 +181,12 @@ export default function ImagePickerExample() {
           }
         }, 
         () => {
+          // Get the download URL of the uploaded image.
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             setUploadedImageUrl(downloadURL);
             Alert.alert('Success', 'Image uploaded successfully!');
-            saveMediaMetadataToDatabase(filename, downloadURL); // メタデータ保存関数を呼び出し
+            // Save the image metadata to the database.
+            saveMediaMetadataToDatabase(filename, downloadURL); 
           });
         }
       );
@@ -166,6 +197,7 @@ export default function ImagePickerExample() {
     }
   };
 
+  // Render the component's UI.
   return (
     <View style={styles.container}>
       <Button title="Pick an image from camera roll" onPress={pickImage} />
@@ -178,7 +210,9 @@ export default function ImagePickerExample() {
             onPress={compressAndUploadImage}
             disabled={isUploading}
           />
+          {/* Display a progress bar during upload. */}
           {isUploading && <ProgressBar progress={uploadProgress / 100} />} 
+          {/* Display the uploaded image URL after upload. */}
           {uploadedImageUrl && (
             <Text>Uploaded Image URL: {uploadedImageUrl}</Text> 
           )}
@@ -188,6 +222,7 @@ export default function ImagePickerExample() {
   );
 }
 
+// Styles for the component.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
