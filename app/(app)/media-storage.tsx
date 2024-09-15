@@ -5,7 +5,6 @@ import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { storage, database, auth } from '../../firebaseConfig'; 
 import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { ref as databaseRef,push, update, serverTimestamp, runTransaction } from 'firebase/database';
-import { getAuth } from 'firebase/auth'; // Firebase Authentication 
 import ProgressBar from './ProgressBar'; 
 
 /**
