@@ -40,22 +40,17 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
       updatedAt: serverTimestamp(),
     };
 
-      console.log("postData:", postData);
-      
-    // users/{userId}/posts に投稿IDをキーとしてtrueを値として保存
-    await update(databaseRef(database, `users/${userId}/posts`), { [postId]: true }) 
-      .then(() => {
-        console.log("users/{userId}/posts に書き込み完了");
-      })
-      .catch((error) => {
-        console.error("users/{userId}/posts 書き込みエラー:", error);
-      });
-    
+    console.log("postData:", postData); // postDataの内容を出力
+    console.log("書き込み開始", userId, postId); 
 
+    try {
+      await update(databaseRef(database, `posts/${postId}`), postData);
+      await update(databaseRef(database, `users/${userId}/posts`), { [postId]: true });
+      console.log("両方の書き込み完了");
+    } catch (error) {
+      console.error("書き込みエラー:", error);
+    }
     
-    
-
-    console.log('メディアメタデータが保存されました');
   } catch (error) {
     console.error('メディアメタデータの保存に失敗しました:', error);
     // エラー発生時の処理 (例: Alertを表示)
