@@ -1,13 +1,14 @@
 import * as React from "react";
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, Image, Text, Dimensions } from "react-native";
+import { StyleSheet, View, Image, Dimensions } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { ref, listAll, getDownloadURL } from 'firebase/storage';
-import { storage } from '../../firebaseConfig'; 
+import { storage,auth } from '../../firebaseConfig'; 
 
 const fetchImageUrls = async () => {
+  const userId = auth.currentUser?.uid;
   const imageUrls: string[] = [];
-  const imagesRef = ref(storage, 'images/'); 
+  const imagesRef = ref(storage, `images/${userId}`); 
 
   try {
     const listResult = await listAll(imagesRef);
@@ -53,7 +54,6 @@ const DisplayMedia = () => {
   );
 };
 
-// ... (styles)
 
 const styles = StyleSheet.create({
   // ... (既存のスタイル)
