@@ -58,6 +58,21 @@ export default function Index() {
           <Text>Go to User Profiles</Text>
         </Pressable>
       </Link>
+      <Link href="/testReactThreeFiber" asChild>
+        <Pressable>
+          <Text>Go to Test React Three Fiber</Text>
+        </Pressable>
+      </Link>
+      <Link href="/testLoadingObject" asChild>
+        <Pressable>
+          <Text>Go to Test Loading Object</Text>
+        </Pressable>
+      </Link>
+      <Link href="/testLoadingObject2" asChild>
+        <Pressable>
+          <Text>Go to Test Loading Object 2</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
