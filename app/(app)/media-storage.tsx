@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { storage, database, auth } from '../../firebaseConfig'; 
 import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-
 import { ref as databaseRef,push, update, serverTimestamp } from 'firebase/database';
 import ProgressBar from './ProgressBar'; 
+import { Post } from '@/types/post'
+
 
 /**
  * Saves media metadata to the Realtime Database using a transaction.
@@ -31,11 +32,11 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
       return;
     }
 
-    const postData = {
+    const postData: Post = {
       postId: postId,
       uid: userId,
       imageURL: downloadURL,
-      caption: 'キャプション', // 必要に応じて変更
+      caption: 'キャプション',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -44,8 +45,13 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
     console.log("書き込み開始", userId, postId); 
 
     try {
-      await update(databaseRef(database, `posts/${postId}`), postData);
-      await update(databaseRef(database, `users/${userId}/posts`), { [postId]: true });
+
+      const updates: { [key: string]: any } = {};
+      
+      updates[`/posts/${userId}/${postId}`] = postData;
+      updates[`/users/${userId}/posts/${postId}`] = true;
+
+      update(databaseRef(database), updates)
       console.log("両方の書き込み完了");
     } catch (error) {
       console.error("書き込みエラー:", error);
