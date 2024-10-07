@@ -5,4 +5,7 @@ export type User = {
   followerCount: number;
   followingCount: number;
   postCount: number;
+  posts?: {
+    [postId: string]: boolean; 
+  };
 }

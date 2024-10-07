@@ -1,12 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Image, View, StyleSheet, Alert, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { storage, database, auth } from '../../firebaseConfig'; 
 import { ref as  storageRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { ref as databaseRef,push, update, serverTimestamp, runTransaction } from 'firebase/database';
-import { getAuth } from 'firebase/auth'; // Firebase Authentication 
+import { ref as databaseRef,push, update, serverTimestamp } from 'firebase/database';
 import ProgressBar from './ProgressBar'; 
+import { Post } from '@/types/post'
+
 
 /**
  * Saves media metadata to the Realtime Database using a transaction.
@@ -31,53 +32,35 @@ const saveMediaMetadataToDatabase = async (filename: string, downloadURL: string
       return;
     }
 
-    // Use a transaction to atomically update the database.
-    await runTransaction(databaseRef(database), async (currentData) => {
-      if (currentData === null) {
-        currentData = {};
-      }
+    const postData: Post = {
+      postId: postId,
+      uid: userId,
+      imageURL: downloadURL,
+      caption: 'キャプション',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
 
-      // Create the post data object.
-      const postData = {
-        postId: postId,
-        uid: userId,
-        imageURL: downloadURL,
-        caption: 'Caption', // Can be customized.
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
+    console.log("postData:", postData); // postDataの内容を出力
+    console.log("書き込み開始", userId, postId); 
 
-      console.log("postData:", postData);
+    try {
 
-      // Add the post data to the 'posts' collection.
-      console.log("Writing to posts collection (within transaction)", postId)    
-      currentData[`posts/${postId}`] = postData;
-      console.log("After adding postData: currentData = ", currentData);
+      const updates: { [key: string]: any } = {};
       
-      // Add a reference to the post in the user's 'posts' node.
-      console.log("Writing to users/{userId}/posts (within transaction)", userId, postId);
-      currentData[`users/${userId}/posts/${postId}`] = true;
-      console.log("After adding user-post link: currentData = ", currentData); 
+      updates[`/posts/${userId}/${postId}`] = postData;
+      updates[`/users/${userId}/posts/${postId}`] = true;
 
-      return currentData;
-    });
-
-    console.log('Media metadata saved successfully (transaction completed)');
-  } catch (error: any) {
-    console.error('Failed to save media metadata:', error);
-    // Handle different error codes.
-    if (error.code === 'PERMISSION_DENIED') {
-      Alert.alert('Error', 'You do not have permission to save media metadata.');
-    } else if (error.code === 'DATABASE_ERROR') {
-      Alert.alert('Error', 'Failed to connect to the database.');
-      // Implement retry logic for database connection errors.
-    } else if (error.code === 'ABORTED') {
-      Alert.alert('Error', 'Transaction aborted. Data might be modified by another user.');
-      // Handle transaction aborts due to conflicts.
-    } else {
-      Alert.alert('Error', 'Failed to save media metadata. Please try again later. Error:', error.message);
-      // Display detailed error information for other errors.
+      update(databaseRef(database), updates)
+      console.log("両方の書き込み完了");
+    } catch (error) {
+      console.error("書き込みエラー:", error);
     }
+    
+  } catch (error) {
+    console.error('メディアメタデータの保存に失敗しました:', error);
+    // エラー発生時の処理 (例: Alertを表示)
+    Alert.alert('Error', 'Failed to save media metadata.');
   }
 };
 
