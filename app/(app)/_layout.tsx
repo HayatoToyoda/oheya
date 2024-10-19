@@ -25,6 +25,7 @@ export default function AppLayout() {
           <Stack.Screen name="media-storage" options={{ title: 'Media storage' }} />
           <Stack.Screen name="test" options={{ title: 'test' }} />
           <Stack.Screen name="profile/index" options={{ title: 'User profiles' }} />
+          <Stack.Screen name="ModelViewer" options={{ title: 'Model Viewer' }} />
         </Stack>
       </>
     );

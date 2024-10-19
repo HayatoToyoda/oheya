@@ -58,6 +58,11 @@ export default function Index() {
           <Text>Go to User Profiles</Text>
         </Pressable>
       </Link>
+      <Link href="/ModelViewer" asChild>
+        <Pressable>
+          <Text>Go to Model Viewer</Text>
+        </Pressable>
+      </Link>
     </View>
   );
 }
