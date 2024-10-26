@@ -1,5 +1,4 @@
-import { Pressable, Text, View } from "react-native";
-import { Link } from "expo-router";
+import { Text, View } from "react-native";
 
 export default function Index() {
   return (
@@ -10,7 +9,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Text>Hello World!!</Text>
+      <Text>Hello World!!.</Text>
     </View>
   );
 }
